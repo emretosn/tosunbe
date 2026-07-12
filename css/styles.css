@@ -1,2 +1,248 @@
-/* styles.css, terminal-like ASCII styling.
-   Filled in during the styling step. */
+/* ============================================================
+   styles.css, terminal-like ASCII aesthetic.
+   Palette: grayscale (dark background, gray and white text).
+   ============================================================ */
+
+/* Design tokens: change these in one place to re-theme. */
+:root {
+  --bg:        #0b0b0b;   /* near-black background        */
+  --fg:        #d0d0d0;   /* default light-gray text      */
+  --fg-bright: #ffffff;   /* white, headings and emphasis */
+  --fg-dim:    #6a6a6a;   /* dim gray, secondary text     */
+  --accent:    #9a9a9a;   /* mid gray, borders and hover  */
+
+  --mono: "SFMono-Regular", "SF Mono", Menlo, Consolas,
+          "DejaVu Sans Mono", monospace;
+
+  --maxw: 1024px;          /* content column width */
+  --space: 1.5rem;        /* base spacing unit    */
+}
+
+/* Light theme: overrides the palette when data-theme="light" is set
+   on the root element. Only the colors change, everything else stays. */
+:root[data-theme="light"] {
+  --bg:        #f4f4f4;   /* near-white background        */
+  --fg:        #2b2b2b;   /* dark gray text               */
+  --fg-bright: #000000;   /* black, headings and emphasis */
+  --fg-dim:    #7a7a7a;   /* mid gray, secondary text     */
+  --accent:    #555555;   /* darker gray, borders         */
+}
+
+/* Reset: predictable box sizing, no default margins. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  /* Root font size. Everything sized in rem scales from this one value. */
+  font-size: 13px;
+  /* Smooth scrolling when clicking nav anchors. */
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--mono);
+  font-size: 1rem;
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+}
+
+/* Content column, centered. */
+.wrap {
+  position: relative;   /* sits above the fluid background */
+  z-index: 1;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: calc(var(--space) * 2) var(--space);
+}
+
+/* ---------- Links ---------- */
+a {
+  color: var(--fg);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+a:hover,
+a:focus-visible {
+  color: var(--fg-bright);
+}
+
+/* ---------- Nav (ASCII menu) ---------- */
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  padding-bottom: var(--space);
+  margin-bottom: calc(var(--space) * 2);
+  border-bottom: 1px solid var(--fg-dim);
+}
+.nav a {
+  color: var(--fg-dim);
+}
+.nav a:hover,
+.nav a:focus-visible {
+  color: var(--fg-bright);
+}
+/* Site handle on the left: reads as branding, not a dim link. */
+.nav-handle {
+  color: var(--fg-bright);
+  font-weight: 600;
+}
+
+/* Theme toggle button: strip default button chrome. */
+.theme-toggle {
+  margin-left: auto;        /* push to the right edge */
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.35rem;
+  background: transparent;
+  border: none;
+  color: var(--fg-dim);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+.theme-toggle:hover,
+.theme-toggle:focus-visible {
+  color: var(--fg-bright);
+}
+.theme-toggle svg {
+  display: block;
+}
+/* Show the icon for the theme you would switch TO.
+   Dark mode (default): show the sun (click to go light).
+   Light mode: show the moon (click to go dark). */
+.theme-toggle .icon-moon { display: none; }
+:root[data-theme="light"] .theme-toggle .icon-sun { display: none; }
+:root[data-theme="light"] .theme-toggle .icon-moon { display: block; }
+
+/* ---------- Hero: portrait next to about ---------- */
+.hero {
+  display: flex;
+  align-items: center;      /* vertically center the about text */
+  gap: calc(var(--space) * 2);
+  flex-wrap: wrap;          /* stack on narrow screens */
+  margin-bottom: calc(var(--space) * 2);
+}
+.hero .portrait,
+.hero .about {
+  margin-bottom: 0;         /* the hero container owns the spacing */
+}
+.hero .about {
+  flex: 1;                  /* take remaining width beside the art */
+  min-width: 12rem;
+}
+
+/* ---------- ASCII portrait ---------- */
+.portrait {
+  margin-bottom: calc(var(--space) * 2);
+}
+.ascii-art {
+  margin: 0;
+  color: var(--fg);
+  font-family: var(--mono);
+  line-height: 1.1;                 /* tight so the art holds its shape */
+  font-size: clamp(6px, 1.6vw, 11px);
+  white-space: pre;                 /* preserve every space */
+  overflow-x: auto;                 /* scroll if too wide   */
+}
+
+/* ---------- Sections ---------- */
+section {
+  margin-bottom: calc(var(--space) * 2);
+}
+.headline {
+  color: var(--fg-bright);
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+}
+/* Block cursor beside the typewriter greeting. */
+.type-cursor {
+  display: inline-block;
+  color: var(--fg-bright);
+  animation: blink 1s step-end infinite;
+}
+.sub {
+  color: var(--fg);
+  margin: 0;
+}
+h2 {
+  color: var(--fg-bright);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+}
+/* ASCII-style heading prefix, so a heading renders as "> work". */
+h2::before {
+  content: "> ";
+  color: var(--fg-dim);
+}
+
+/* Links with icons: align the SVG with its label. */
+.link-icon {
+  flex-shrink: 0;           /* keep the icon from squashing */
+}
+
+/* ---------- Footer (divided) ---------- */
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;   /* links left, prompt right */
+  flex-wrap: wrap;                  /* stack on narrow screens */
+  gap: var(--space);
+  margin-top: calc(var(--space) * 3);
+  padding-top: var(--space);
+  border-top: 1px solid var(--fg-dim);   /* the dividing line */
+  color: var(--fg-dim);
+}
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.footer-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--fg);
+}
+.footer-links a:hover,
+.footer-links a:focus-visible {
+  color: var(--fg-bright);
+}
+.footer-prompt {
+  color: var(--fg-dim);
+}
+.cursor {
+  display: inline-block;
+  color: var(--fg-bright);
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* ---------- Fluid background layer (filled in later) ---------- */
+#fluid-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;   /* clicks pass through to the content */
+}
+
+/* ---------- Accessibility: honor reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .cursor { animation: none; }
+  * { transition: none !important; }
+}
