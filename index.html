@@ -95,6 +95,25 @@ rrrvrrrmrrmrrmmrrrrrrrmrrmmmrrmmmmmrrrrrrrmrrrrrrrrrrvrrrrrmrrrrrmrrmrrrrmrmrrrr
     </div>
   </main>
 
+  <!-- macOS-style window for viewing the CV, hidden until "open cv.pdf". -->
+  <div id="cv-window" class="win" role="dialog" aria-label="cv.pdf" aria-modal="false" hidden>
+    <div class="win-titlebar" id="cv-titlebar">
+      <div class="win-lights">
+        <button class="win-light win-close" id="cv-close" type="button" aria-label="Close"></button>
+        <span class="win-light win-min" aria-hidden="true"></span>
+        <span class="win-light win-max" aria-hidden="true"></span>
+      </div>
+      <span class="win-title">cv.pdf</span>
+    </div>
+    <div class="win-body">
+      <iframe id="cv-frame" class="win-frame" title="CV PDF" src="about:blank"></iframe>
+    </div>
+    <div class="win-resize win-resize--nw" data-dir="nw" aria-hidden="true"></div>
+    <div class="win-resize win-resize--ne" data-dir="ne" aria-hidden="true"></div>
+    <div class="win-resize win-resize--sw" data-dir="sw" aria-hidden="true"></div>
+    <div class="win-resize win-resize--se" data-dir="se" aria-hidden="true"></div>
+  </div>
+
   <script src="js/main.js" defer></script>
 </body>
 </html>

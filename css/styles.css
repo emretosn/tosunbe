@@ -66,6 +66,7 @@ a:focus-visible {
 
 /* ---------- ASCII portrait (centered) ---------- */
 .portrait {
+  margin-top: 2rem;                 /* breathing room where the nav used to be */
   margin-bottom: 0.5rem;            /* tight gap to the terminal below */
   text-align: center;               /* center the art block */
 }
@@ -192,6 +193,98 @@ section {
 .tmux-right {
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* ---------- macOS-style CV window ---------- */
+.win {
+  position: fixed;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  width: min(760px, 92vw);
+  height: min(82vh, 1000px);
+  min-width: 320px;
+  min-height: 240px;
+  background: var(--term-bg);
+  border: 1px solid var(--fg-dim);
+  border-radius: 8px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  overflow: hidden;                  /* clip children to the rounded corners */
+}
+.win[hidden] {
+  display: none;                     /* override the flex display when hidden */
+}
+.win-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: #2a2a2a;
+  cursor: move;
+  user-select: none;
+  touch-action: none;                /* let the drag handler own the gesture */
+}
+.win-lights {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+  z-index: 3;                        /* stay clickable above corner handles */
+}
+.win-light {
+  width: 12px;
+  height: 12px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+}
+.win-close { background: #ff5f56; cursor: pointer; }
+.win-min   { background: #ffbd2e; }
+.win-max   { background: #27c93f; }
+.win-title {
+  color: var(--fg);
+  font-size: 0.9rem;
+}
+.win-body {
+  flex: 1;
+  min-height: 0;
+  background: #ffffff;               /* PDF viewer backdrop */
+}
+.win-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+/* Resize grips at all four corners. */
+.win-resize {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  z-index: 2;
+  touch-action: none;
+}
+.win-resize--nw { left: 0;  top: 0;    cursor: nwse-resize; }
+.win-resize--ne { right: 0; top: 0;    cursor: nesw-resize; }
+.win-resize--sw { left: 0;  bottom: 0; cursor: nesw-resize; }
+.win-resize--se { right: 0; bottom: 0; cursor: nwse-resize; }
+/* Subtle visual grip on the bottom-right corner. */
+.win-resize--se {
+  background: linear-gradient(135deg, transparent 55%, var(--fg-dim) 55%);
+}
+/* Mobile / touch devices: a fixed, padded window that fills the screen within
+   its edges. Using inset means the size follows the screen orientation
+   automatically, in both portrait and landscape. */
+@media (hover: none) and (pointer: coarse) {
+  .win {
+    inset: 1rem;
+    width: auto;
+    height: auto;
+    min-width: 0;
+    min-height: 0;
+  }
+  .win-titlebar { cursor: default; }   /* no dragging on touch devices */
+  .win-resize { display: none; }       /* no manual resize on touch devices */
 }
 
 /* ---------- Fluid background layer (filled in later) ---------- */
