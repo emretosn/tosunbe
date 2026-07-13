@@ -69,6 +69,28 @@
     clear: function () {
       output.innerHTML = "";
     },
+    ls: function () {
+      if (!window.vfs) { print("ls: filesystem unavailable", "term-error"); return; }
+      print(window.vfs.list().join("  "));
+    },
+    cat: function (args) {
+      if (!window.vfs) { print("cat: filesystem unavailable", "term-error"); return; }
+      const name = args[0];
+      if (!name) { print("usage: cat <file>", "term-error"); return; }
+      if (!window.vfs.exists(name)) {
+        print("cat: " + name + ": no such file", "term-error");
+        return;
+      }
+      const file = window.vfs.get(name);
+      if (file.binary) {
+        print(file.hint || ("cat: " + name + ": binary file"), "term-error");
+        return;
+      }
+      file.content.split("\n").forEach(function (line) { print(line); });
+    },
+    pwd: function () {
+      print(window.vfs ? window.vfs.home() : "/home/visitor");
+    },
     open: function (args) {
       const target = (args[0] || "").toLowerCase();
       if (target === "cv.pdf" || target === "cv") {
@@ -104,6 +126,9 @@
     help:   "list available commands",
     about:  "who is Emre",
     whoami: "print the current user",
+    ls:     "list files",
+    cat:    "print a file, for example: cat about.txt",
+    pwd:    "print the working directory",
     github: "open my github profile",
     email:  "get in touch by email",
     open:   "open cv.pdf in a window",
