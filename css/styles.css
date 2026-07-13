@@ -17,6 +17,9 @@
 
   --maxw: 1024px;          /* content column width */
   --space: 1.5rem;        /* base spacing unit    */
+
+  --cv-gap: 1.5rem;        /* gap around the docked CV panel        */
+  --cv-area: 0px;          /* space reserved on the right for the CV */
 }
 
 /* Reset: predictable box sizing, no default margins. */
@@ -42,6 +45,14 @@ body {
   font-size: 1rem;
   line-height: 1.6;
   letter-spacing: 0.02em;
+  /* Reserve room on the right for the docked CV panel, animated. */
+  padding-right: var(--cv-area);
+  transition: padding-right 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* When the CV panel is docked, hold the reserved space on the right. */
+body.cv-docked {
+  --cv-area: var(--cv-reserve, 0px);
 }
 
 /* Content column, centered. */
@@ -51,6 +62,12 @@ body {
   max-width: var(--maxw);
   margin: 0 auto;
   padding: var(--space) var(--space) calc(var(--space) * 2);
+  transition: padding 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* Tighter side padding when squeezed next to the CV panel. */
+body.cv-docked .wrap {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
 }
 
 /* ---------- Links ---------- */
@@ -214,6 +231,31 @@ section {
 .win[hidden] {
   display: none;                     /* override the flex display when hidden */
 }
+
+/* Docked variant: a static A4 panel pinned to the right, vertically centered.
+   The content column shifts left to make room (see body.cv-docked above). */
+.win--docked {
+  top: 50%;
+  right: var(--cv-gap);
+  left: auto;
+  bottom: auto;
+  width: auto;                       /* width follows the A4 aspect ratio */
+  height: min(90vh, 960px);
+  aspect-ratio: 210 / 297;           /* A4 portrait */
+  min-width: 0;
+  min-height: 0;
+  transform: translateY(-50%);
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.45s ease;
+}
+/* Slide in from the right on open, slide back out on close. */
+.win--docked.win--entering {
+  transform: translate(2rem, -50%);
+  opacity: 0;
+}
+/* A static panel has no drag handle and no resize grips. */
+.win--docked .win-titlebar { cursor: default; }
+.win--docked .win-resize { display: none; }
 .win-titlebar {
   display: flex;
   align-items: center;

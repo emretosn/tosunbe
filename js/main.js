@@ -173,21 +173,70 @@
   }
   // Re-clear when rotating into (or resizing down to) the mobile layout.
   mobileQuery.addEventListener("change", function (e) {
-    if (e.matches) clearInlineBox();
+    if (e.matches) {
+      clearInlineBox();
+      win.classList.remove("win--docked", "win--entering");
+      document.body.classList.remove("cv-docked");
+      document.body.style.removeProperty("--cv-reserve");
+    }
   });
+
+  function reservedSpace() {
+    // Space the docked panel needs on the right: its own width, its gap from
+    // the screen edge, and a matching gap between it and the content.
+    const gap = 1.5 * parseFloat(
+      getComputedStyle(document.documentElement).fontSize
+    );
+    return win.offsetWidth + gap * 2;
+  }
+
+  function dockWidthUpdate() {
+    document.body.style.setProperty("--cv-reserve", reservedSpace() + "px");
+  }
+
+  let closeTimer = null;
 
   function openCV() {
     // Load the PDF lazily the first time the window opens.
     if (frame.getAttribute("src") !== CV_SRC) frame.setAttribute("src", CV_SRC);
+    clearTimeout(closeTimer);
     win.hidden = false;
     if (isMobile()) { clearInlineBox(); return; }   // CSS handles placement
-    // Center it within the viewport.
-    const w = win.offsetWidth;
-    const h = win.offsetHeight;
-    win.style.left = Math.max(0, Math.round((window.innerWidth - w) / 2)) + "px";
-    win.style.top = Math.max(0, Math.round((window.innerHeight - h) / 2)) + "px";
+
+    // Desktop: dock as a static A4 panel on the right and let the content
+    // column slide left to sit beside it.
+    clearInlineBox();                 // drop any leftover drag position
+    win.classList.add("win--docked", "win--entering");
+    // Force a layout read so the panel has real dimensions before we measure.
+    dockWidthUpdate();
+    document.body.classList.add("cv-docked");
+    // Next frame: remove the entering offset so it slides into place.
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { win.classList.remove("win--entering"); });
+    });
   }
-  function closeCV() { win.hidden = true; }
+
+  function closeCV() {
+    if (isMobile() || !win.classList.contains("win--docked")) {
+      win.hidden = true;
+      return;
+    }
+    // Desktop: slide the panel back out while the content floats to center.
+    win.classList.add("win--entering");
+    document.body.classList.remove("cv-docked");
+    clearTimeout(closeTimer);
+    closeTimer = setTimeout(function () {
+      win.hidden = true;
+      win.classList.remove("win--docked", "win--entering");
+      document.body.style.removeProperty("--cv-reserve");
+    }, 460);
+  }
+
+  // Keep the reserved space correct if the viewport is resized while docked
+  // (the A4 width tracks the viewport height).
+  window.addEventListener("resize", function () {
+    if (document.body.classList.contains("cv-docked")) dockWidthUpdate();
+  });
 
   // Expose the opener so the terminal command can call it.
   window.openCvWindow = openCV;
@@ -207,7 +256,8 @@
   // Drag the window by its title bar, kept fully inside the viewport.
   let dragging = false, dsx, dsy, dox, doy;
   titlebar.addEventListener("pointerdown", function (e) {
-    if (e.target === closeBtn || isMobile()) return;
+    if (e.target === closeBtn || isMobile() ||
+        win.classList.contains("win--docked")) return;
     dragging = true;
     dsx = e.clientX; dsy = e.clientY;
     const r = win.getBoundingClientRect();
@@ -235,6 +285,7 @@
   let resizing = null, rsx, rsy, rleft, rtop, rw, rh, activeHandle;
   handles.forEach(function (handle) {
     handle.addEventListener("pointerdown", function (e) {
+      if (win.classList.contains("win--docked")) return;
       resizing = handle.dataset.dir;
       activeHandle = handle;
       rsx = e.clientX; rsy = e.clientY;
