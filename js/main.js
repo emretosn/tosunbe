@@ -281,3 +281,100 @@
     handle.addEventListener("pointercancel", stopResize);
   });
 })();
+
+/* ============================================================
+   Fluid background: a faint grid of 0/1 bits whose brightness
+   ripples like slow waves. Drawn on a single canvas for speed,
+   so the browser paints once per frame instead of animating
+   thousands of DOM nodes.
+   ============================================================ */
+(function () {
+  const canvas = document.getElementById("fluid-bg");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d", { alpha: true });
+  if (!ctx) return;
+
+  // If the visitor prefers reduced motion, draw one static frame
+  // and never animate.
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const CELL = 18;          // pixel size of one bit cell
+  const BASE_ALPHA = 0.03;  // faint floor so it never distracts
+  const WAVE_ALPHA = 0.035; // how much the ripple brightens a cell
+  const FONT_PX = 12;
+
+  let cols = 0, rows = 0;
+  let bits = [];            // fixed 0/1 value per cell, assigned once
+  let width = 0, height = 0;
+
+  // Match the canvas to the screen and account for high-DPI displays
+  // so the text stays crisp without over-drawing.
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = Math.floor(width * dpr);
+    canvas.height = Math.floor(height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.font = FONT_PX + "px " +
+      'ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace';
+    ctx.textBaseline = "top";
+
+    cols = Math.ceil(width / CELL);
+    rows = Math.ceil(height / CELL);
+    bits = new Array(cols * rows);
+    for (let i = 0; i < bits.length; i++) {
+      bits[i] = Math.random() < 0.5 ? "0" : "1";
+    }
+  }
+
+  // One frame: for every cell, a moving sine field decides its
+  // brightness so waves appear to travel across the grid.
+  function draw(time) {
+    ctx.clearRect(0, 0, width, height);
+    const t = time * 0.0006;   // slow time scale = calm waves
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        const wave = Math.sin(x * 0.18 + y * 0.12 + t) *
+                     Math.cos(x * 0.05 - y * 0.16 - t * 0.7);
+        const alpha = BASE_ALPHA + Math.max(0, wave) * WAVE_ALPHA;
+        ctx.fillStyle = "rgba(255, 255, 255, " + alpha.toFixed(3) + ")";
+        ctx.fillText(bits[y * cols + x], x * CELL, y * CELL);
+      }
+    }
+  }
+
+  let running = false;
+  function loop(time) {
+    if (!running) return;
+    draw(time);
+    requestAnimationFrame(loop);
+  }
+  function start() {
+    if (running || reduceMotion) return;
+    running = true;
+    requestAnimationFrame(loop);
+  }
+  function stop() {
+    running = false;
+  }
+
+  // Pause when the tab is hidden so it costs no battery in the background.
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) stop();
+    else start();
+  });
+
+  let resizeTimer = null;
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () {
+      resize();
+      if (reduceMotion) draw(0);
+    }, 150);
+  });
+
+  resize();
+  if (reduceMotion) draw(0);
+  else start();
+})();
