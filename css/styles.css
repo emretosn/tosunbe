@@ -98,6 +98,10 @@ a:focus-visible {
   white-space: pre;                 /* preserve every space */
   overflow-x: auto;                 /* scroll if too wide   */
 }
+/* When encrypted, the portrait invites a click to decrypt. */
+.ascii-art.is-encrypted {
+  cursor: pointer;
+}
 
 /* ---------- Sections ---------- */
 section {

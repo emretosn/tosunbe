@@ -87,6 +87,16 @@
       } else {
         print("heap unavailable", "term-error");
       }
+    },
+    encrypt: function () {
+      if (typeof window.encryptAscii === "function") {
+        window.encryptAscii().then(function (ok) {
+          if (ok) print("portrait encrypted (AES-256-GCM) click it to decrypt");
+          else print("already encrypted. click the portrait to decrypt.");
+        });
+      } else {
+        print("encrypt unavailable", "term-error");
+      }
     }
   };
 
@@ -98,6 +108,7 @@
     email:  "get in touch by email",
     open:   "open cv.pdf in a window",
     heap:   "pour the ascii portrait into a heap",
+    encrypt: "encrypt the portrait",
     clear:  "clear the screen"
   };
 
