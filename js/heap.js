@@ -23,6 +23,9 @@
   let canvas = null;
   let ctx = null;
   let rafId = null;
+  let trackId = null;      // keeps the canvas aligned with the portrait
+  let lastLeft = null;
+  let lastTop = null;
   let running = false;
 
   // The simulation grid. grid[row][col] holds a character, or null if empty.
@@ -133,6 +136,23 @@
 
     document.body.appendChild(canvas);
     pre.style.visibility = "hidden";       // hide the real art while it heaps
+    lastLeft = basin.left;
+    lastTop = basin.top;
+  }
+
+  // Keep the fixed canvas glued to the portrait's live position. The portrait
+  // shifts left when the CV panel docks, so we re-read its box each frame and
+  // recenter the canvas over the terminal. This runs the whole time the heap
+  // is on screen (even after the sand settles), then stops on restore.
+  function track() {
+    if (!canvas) return;
+    const termRect = termWindow.getBoundingClientRect();
+    const artRect = pre.getBoundingClientRect();
+    const left = Math.round(termRect.left + termRect.width / 2 - basin.width / 2);
+    const top = Math.round(artRect.top);
+    if (left !== lastLeft) { canvas.style.left = left + "px"; lastLeft = left; }
+    if (top !== lastTop) { canvas.style.top = top + "px"; lastTop = top; }
+    trackId = requestAnimationFrame(track);
   }
 
   // One tick of the falling-sand rules. Returns true if anything moved, so we
@@ -203,6 +223,7 @@
     if (!canvas) return;
     running = false;
     if (rafId) cancelAnimationFrame(rafId);
+    if (trackId) cancelAnimationFrame(trackId);
     canvas.remove();       // also drops its click listener
     canvas = null;
     ctx = null;
@@ -214,6 +235,7 @@
     setup();
     running = true;
     rafId = requestAnimationFrame(loop);
+    trackId = requestAnimationFrame(track);
   }
 
   // Exposed for the terminal "heap" command.
