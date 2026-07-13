@@ -6,39 +6,11 @@
   <title>emre</title>
   <meta name="description" content="Personal site of Emre." />
   <link rel="stylesheet" href="css/styles.css" />
-  <script>
-    // Set the theme before first paint to avoid a flash of the wrong mode.
-    // Priority: saved choice, then the operating system preference.
-    (function () {
-      var saved = localStorage.getItem("theme");
-      var prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
-      var theme = saved || (prefersLight ? "light" : "dark");
-      document.documentElement.setAttribute("data-theme", theme);
-    })();
-  </script>
 </head>
 <body>
   <div id="fluid-bg" aria-hidden="true"></div>
 
   <main class="wrap">
-    <nav class="nav" aria-label="Main">
-      <a href="#" class="nav-handle">emre.tosun.be</a>
-      <button id="theme-btn" class="theme-toggle" aria-label="Toggle light and dark mode" title="Toggle theme">
-        <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none"
-             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-             aria-hidden="true">
-          <circle cx="12" cy="12" r="4" />
-          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
-        </svg>
-        <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none"
-             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-             aria-hidden="true">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z" />
-        </svg>
-      </button>
-    </nav>
-
-    <div class="hero">
     <section id="portrait" class="portrait">
 <pre class="ascii-art" aria-label="ASCII portrait">
 
@@ -103,54 +75,24 @@ rrrvrrrmrrmrrmmrrrrrrrmrrmmmrrmmmmmrrrrrrrmrrrrrrrrrrvrrrrrmrrrrrmrrmrrrrmrmrrrr
 </pre>
     </section>
 
-    <section id="about" class="about">
-      <h1 class="headline">
-          <span class="greeting" data-words="Hello!,Bonjour!,Merhaba!" aria-label="Hello!"></span><span class="type-cursor" aria-hidden="true">█</span><br>
-          I'm Emre Tosun.
-      </h1>
-      <p class="sub">
-      A security-focused engineer and researcher who loves working where cryptography, AI and cloud meet.
-      </p>
+    <div class="term-window">
+    <section id="terminal" class="terminal" aria-label="Terminal">
+      <div class="term-output" id="term-output" aria-live="polite"></div>
+      <form class="term-line" id="term-form" autocomplete="off">
+        <label for="term-input" class="term-prompt">visitor@tosunbe:~$</label>
+        <span class="term-field">
+          <span class="term-mirror" id="term-mirror" aria-hidden="true"></span><span class="term-cursor" id="term-cursor" aria-hidden="true">&#9608;</span>
+          <input id="term-input" class="term-input" type="text" name="cmd"
+                 autocomplete="off" autocapitalize="off" autocorrect="off"
+                 spellcheck="false" aria-label="Terminal command input" />
+        </span>
+      </form>
     </section>
+    <div class="tmux-status" aria-hidden="true">
+      <span class="tmux-left"><span class="tmux-session">[0]</span> <span class="tmux-window">0:zsh*</span></span>
+      <span class="tmux-right" id="tmux-clock"></span>
     </div>
-
-    <footer id="links" class="footer">
-      <ul class="footer-links">
-        <li>
-          <a href="https://github.com/emretosn">
-            <svg class="link-icon" viewBox="0 0 24 24" width="16" height="16"
-                 fill="currentColor" aria-hidden="true">
-              <path d="M12 .5a12 12 0 0 0-3.79 23.39c.6.11.82-.26.82-.58
-                       0-.29-.01-1.04-.02-2.05-3.34.73-4.04-1.61-4.04-1.61
-                       -.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73
-                       1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5.99
-                       .11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.34-5.47-5.95
-                       0-1.31.47-2.39 1.24-3.23-.13-.3-.54-1.52.11-3.18
-                       0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6.01 0
-                       c2.29-1.55 3.3-1.23 3.3-1.23.65 1.66.24 2.88.12 3.18
-                       .77.84 1.23 1.92 1.23 3.23 0 4.62-2.81 5.64-5.49 5.94
-                       .43.37.82 1.1.82 2.22 0 1.61-.02 2.9-.02 3.29
-                       0 .32.22.7.83.58A12 12 0 0 0 12 .5Z" />
-            </svg>
-            github
-          </a>
-        </li>
-        <li>
-          <a href="mailto:info.emre@tosun.be"> <!-- Could add GPG here. -->
-            <svg class="link-icon" viewBox="0 0 24 24" width="16" height="16" fill="none"
-                 stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                 stroke-linejoin="round" aria-hidden="true">
-              <rect x="3" y="5" width="18" height="14" rx="2" />
-              <path d="m3 7 9 6 9-6" />
-            </svg>
-            email
-          </a>
-        </li>
-      </ul>
-      <span class="footer-prompt">
-        visitor@tosunbe:~$ <span class="cursor" aria-hidden="true">█</span>
-      </span>
-    </footer>
+    </div>
   </main>
 
   <script src="js/main.js" defer></script>

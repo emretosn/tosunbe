@@ -5,7 +5,8 @@
 
 /* Design tokens: change these in one place to re-theme. */
 :root {
-  --bg:        #0b0b0b;   /* near-black background        */
+  --bg:        #0b0b0b;   /* near-black page background    */
+  --term-bg:   #1a1a1a;   /* dark gray, the terminal box   */
   --fg:        #d0d0d0;   /* default light-gray text      */
   --fg-bright: #ffffff;   /* white, headings and emphasis */
   --fg-dim:    #6a6a6a;   /* dim gray, secondary text     */
@@ -16,16 +17,6 @@
 
   --maxw: 1024px;          /* content column width */
   --space: 1.5rem;        /* base spacing unit    */
-}
-
-/* Light theme: overrides the palette when data-theme="light" is set
-   on the root element. Only the colors change, everything else stays. */
-:root[data-theme="light"] {
-  --bg:        #f4f4f4;   /* near-white background        */
-  --fg:        #2b2b2b;   /* dark gray text               */
-  --fg-bright: #000000;   /* black, headings and emphasis */
-  --fg-dim:    #7a7a7a;   /* mid gray, secondary text     */
-  --accent:    #555555;   /* darker gray, borders         */
 }
 
 /* Reset: predictable box sizing, no default margins. */
@@ -59,7 +50,7 @@ body {
   z-index: 1;
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: calc(var(--space) * 2) var(--space);
+  padding: var(--space) var(--space) calc(var(--space) * 2);
 }
 
 /* ---------- Links ---------- */
@@ -73,82 +64,19 @@ a:focus-visible {
   color: var(--fg-bright);
 }
 
-/* ---------- Nav (ASCII menu) ---------- */
-.nav {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.75rem 1.25rem;
-  padding-bottom: var(--space);
-  margin-bottom: calc(var(--space) * 2);
-  border-bottom: 1px solid var(--fg-dim);
-}
-.nav a {
-  color: var(--fg-dim);
-}
-.nav a:hover,
-.nav a:focus-visible {
-  color: var(--fg-bright);
-}
-/* Site handle on the left: reads as branding, not a dim link. */
-.nav-handle {
-  color: var(--fg-bright);
-  font-weight: 600;
-}
-
-/* Theme toggle button: strip default button chrome. */
-.theme-toggle {
-  margin-left: auto;        /* push to the right edge */
-  display: inline-flex;
-  align-items: center;
-  padding: 0.15rem 0.35rem;
-  background: transparent;
-  border: none;
-  color: var(--fg-dim);
-  cursor: pointer;
-  transition: color 0.15s ease;
-}
-.theme-toggle:hover,
-.theme-toggle:focus-visible {
-  color: var(--fg-bright);
-}
-.theme-toggle svg {
-  display: block;
-}
-/* Show the icon for the theme you would switch TO.
-   Dark mode (default): show the sun (click to go light).
-   Light mode: show the moon (click to go dark). */
-.theme-toggle .icon-moon { display: none; }
-:root[data-theme="light"] .theme-toggle .icon-sun { display: none; }
-:root[data-theme="light"] .theme-toggle .icon-moon { display: block; }
-
-/* ---------- Hero: portrait next to about ---------- */
-.hero {
-  display: flex;
-  align-items: center;      /* vertically center the about text */
-  gap: calc(var(--space) * 2);
-  flex-wrap: wrap;          /* stack on narrow screens */
-  margin-bottom: calc(var(--space) * 2);
-}
-.hero .portrait,
-.hero .about {
-  margin-bottom: 0;         /* the hero container owns the spacing */
-}
-.hero .about {
-  flex: 1;                  /* take remaining width beside the art */
-  min-width: 12rem;
-}
-
-/* ---------- ASCII portrait ---------- */
+/* ---------- ASCII portrait (centered) ---------- */
 .portrait {
-  margin-bottom: calc(var(--space) * 2);
+  margin-bottom: 0.5rem;            /* tight gap to the terminal below */
+  text-align: center;               /* center the art block */
 }
 .ascii-art {
+  display: inline-block;            /* shrink to the art, then center it */
+  text-align: left;                 /* keep the art's own alignment */
   margin: 0;
   color: var(--fg);
   font-family: var(--mono);
   line-height: 1.1;                 /* tight so the art holds its shape */
-  font-size: clamp(6px, 1.6vw, 11px);
+  font-size: clamp(6px, 1.6vw, 7px);
   white-space: pre;                 /* preserve every space */
   overflow-x: auto;                 /* scroll if too wide   */
 }
@@ -157,79 +85,113 @@ a:focus-visible {
 section {
   margin-bottom: calc(var(--space) * 2);
 }
-.headline {
-  color: var(--fg-bright);
-  font-size: clamp(1.4rem, 4vw, 2rem);
-  font-weight: 600;
-  margin: 0 0 0.5rem;
+
+/* ---------- Terminal emulator ---------- */
+.term-window {
+  border: 1px solid var(--fg-dim);   /* the box, as wide as the nav */
+  border-radius: 4px;
+  overflow: hidden;                  /* clip children to the rounded corners */
 }
-/* Block cursor beside the typewriter greeting. */
-.type-cursor {
-  display: inline-block;
+.terminal {
+  height: 20rem;                     /* static size, does not grow */
+  overflow-y: auto;                  /* the whole box scrolls internally */
+  margin: 0;
+  padding: var(--space);
+  background: var(--term-bg);        /* distinct from the page background */
+  color: var(--fg);
+  cursor: text;
+}
+.term-output {
+  margin: 0;
+  white-space: pre-wrap;             /* wrap long lines, keep spacing */
+  word-break: break-word;
+}
+.term-output .line {
+  margin: 0;
+}
+.term-output .term-echo {
+  color: var(--fg-bright);           /* the command the visitor typed */
+}
+.term-output .term-error {
+  color: var(--fg);
+}
+.term-output a {
   color: var(--fg-bright);
+  text-decoration: underline;
+}
+
+/* Input line: flows right after the printed output (not pinned to bottom). */
+.term-line {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+.term-prompt {
+  color: var(--fg-bright);
+  white-space: nowrap;
+}
+/* The field overlays a transparent input on top of a text mirror, so we
+   can draw our own block cursor instead of the native caret. */
+.term-field {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: inline-flex;
+  align-items: baseline;
+}
+.term-mirror {
+  white-space: pre;
+  color: var(--fg);
+}
+.term-cursor {
+  color: var(--fg-bright);
+  visibility: hidden;                /* only shown while the input is focused */
+}
+.term-field:focus-within .term-cursor {
+  visibility: visible;
   animation: blink 1s step-end infinite;
 }
-.sub {
-  color: var(--fg);
-  margin: 0;
-}
-h2 {
-  color: var(--fg-bright);
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin: 0 0 0.5rem;
-}
-/* ASCII-style heading prefix, so a heading renders as "> work". */
-h2::before {
-  content: "> ";
-  color: var(--fg-dim);
-}
-
-/* Links with icons: align the SVG with its label. */
-.link-icon {
-  flex-shrink: 0;           /* keep the icon from squashing */
-}
-
-/* ---------- Footer (divided) ---------- */
-.footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;   /* links left, prompt right */
-  flex-wrap: wrap;                  /* stack on narrow screens */
-  gap: var(--space);
-  margin-top: calc(var(--space) * 3);
-  padding-top: var(--space);
-  border-top: 1px solid var(--fg-dim);   /* the dividing line */
-  color: var(--fg-dim);
-}
-.footer-links {
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
-  list-style: none;
-  margin: 0;
+.term-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: transparent;                /* the mirror shows the text instead */
+  caret-color: transparent;          /* hide native caret, use block cursor */
+  font: inherit;
+  letter-spacing: inherit;
   padding: 0;
 }
-.footer-links a {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  color: var(--fg);
-}
-.footer-links a:hover,
-.footer-links a:focus-visible {
-  color: var(--fg-bright);
-}
-.footer-prompt {
-  color: var(--fg-dim);
-}
-.cursor {
-  display: inline-block;
-  color: var(--fg-bright);
-  animation: blink 1s step-end infinite;
-}
+
 @keyframes blink {
   50% { opacity: 0; }
+}
+
+/* ---------- tmux-style status bar ---------- */
+.tmux-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space);
+  padding: 0 0.5rem;
+  background: #00af00;               /* tmux default green */
+  color: #000000;                   /* black text, like tmux */
+  font-size: 0.9rem;
+  line-height: 1.6;
+  white-space: nowrap;
+  user-select: none;
+}
+.tmux-session {
+  color: #000000;
+}
+.tmux-window {
+  padding: 0 0.25rem;
+}
+.tmux-right {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ---------- Fluid background layer (filled in later) ---------- */
@@ -243,6 +205,6 @@ h2::before {
 /* ---------- Accessibility: honor reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .cursor { animation: none; }
+  .term-cursor { animation: none; }
   * { transition: none !important; }
 }
