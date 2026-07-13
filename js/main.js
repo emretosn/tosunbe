@@ -82,7 +82,7 @@
     },
     heap: function () {
       if (typeof window.heapAscii === "function") {
-        print("ouch, pouring into a heap... click or press any key to restore");
+        print("ouch, pouring into a heap... click the heap to restore");
         window.heapAscii();
       } else {
         print("heap unavailable", "term-error");

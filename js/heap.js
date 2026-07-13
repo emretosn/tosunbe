@@ -23,7 +23,6 @@
   let canvas = null;
   let ctx = null;
   let rafId = null;
-  let armTimer = null;
   let running = false;
 
   // The simulation grid. grid[row][col] holds a character, or null if empty.
@@ -117,7 +116,8 @@
     canvas.style.width = basin.width + "px";
     canvas.style.height = basin.height + "px";
     canvas.style.zIndex = "50";           // above content, below the CV window
-    canvas.style.pointerEvents = "none";  // clicks pass through to restore
+    canvas.style.pointerEvents = "auto";  // the heap itself is the click target
+    canvas.style.cursor = "pointer";
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = Math.floor(basin.width * dpr);
@@ -127,6 +127,9 @@
     ctx.font = fontPx + "px " + fontFamily;
     ctx.textBaseline = "top";
     ctx.fillStyle = fgColor;
+
+    // Clicking the heap snaps the portrait back.
+    canvas.addEventListener("click", restore);
 
     document.body.appendChild(canvas);
     pre.style.visibility = "hidden";       // hide the real art while it heaps
@@ -200,27 +203,17 @@
     if (!canvas) return;
     running = false;
     if (rafId) cancelAnimationFrame(rafId);
-    clearTimeout(armTimer);
-    window.removeEventListener("keydown", restore);
-    window.removeEventListener("pointerdown", restore);
-    canvas.remove();
+    canvas.remove();       // also drops its click listener
     canvas = null;
     ctx = null;
     pre.style.visibility = "";
   }
 
   function start() {
-    if (running) return;   // ignore a second heap while one is active
+    if (canvas) return;    // ignore a second heap while one is on screen
     setup();
     running = true;
     rafId = requestAnimationFrame(loop);
-
-    // Arm the restore listeners after a short delay so the very key press that
-    // launched the command (Enter) does not immediately snap it back.
-    armTimer = setTimeout(function () {
-      window.addEventListener("keydown", restore);
-      window.addEventListener("pointerdown", restore);
-    }, 500);
   }
 
   // Exposed for the terminal "heap" command.
