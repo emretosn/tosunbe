@@ -79,6 +79,14 @@
       } else {
         print("cannot open: " + target, "term-error");
       }
+    },
+    heap: function () {
+      if (typeof window.heapAscii === "function") {
+        print("ouch, pouring into a heap... click or press any key to restore");
+        window.heapAscii();
+      } else {
+        print("heap unavailable", "term-error");
+      }
     }
   };
 
@@ -89,6 +97,7 @@
     github: "open my github profile",
     email:  "get in touch by email",
     open:   "open cv.pdf in a window",
+    heap:   "pour the ascii portrait into a heap",
     clear:  "clear the screen"
   };
 
