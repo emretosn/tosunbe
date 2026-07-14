@@ -43,17 +43,32 @@
     });
   }
 
+  // Some commands need an argument to do anything useful. When shown as a
+  // clickable hint, they should run a sensible full invocation, not the bare
+  // name (which would only print a usage message).
+  const runHints = {
+    open: "open cv.pdf",
+    cat: "cat about.txt"
+  };
+
+  // A clickable command hint. Clicking it runs the command (see the delegated
+  // click handler on the output). The name is trusted (comes from our own
+  // registry) but we escape it anyway out of habit.
+  function cmdLink(name) {
+    const safeText = escapeHtml(name);
+    const safeRun = escapeHtml(runHints[name] || name);
+    return '<a class="term-cmd" data-cmd="' + safeRun + '" href="#">' +
+           safeText + "</a>";
+  }
+
   // The command registry. Each command prints its own output.
   const commands = {
     help: function () {
       print("available commands:");
       Object.keys(commands).sort().forEach(function (name) {
-        print("  " + name.padEnd(8) + " " + descriptions[name]);
+        const pad = " ".repeat(Math.max(1, 9 - name.length));
+        print("  " + cmdLink(name) + pad + descriptions[name], null, true);
       });
-    },
-    about: function () {
-      print("Emre Tosun, a security focused engineer and researcher");
-      print("who loves working where cryptography, AI and cloud meet.");
     },
     whoami: function () {
       print("visitor");
@@ -124,7 +139,6 @@
 
   const descriptions = {
     help:   "list available commands",
-    about:  "who is Emre",
     whoami: "print the current user",
     ls:     "list files",
     cat:    "print a file, for example: cat about.txt",
@@ -149,18 +163,115 @@
     if (commands[name]) {
       commands[name](args);
     } else {
-      print("command not found: " + name + ". type 'help'.", "term-error");
+      print("command not found: " + escapeHtml(name) + ". type " +
+            cmdLink("help") + ".", "term-error", true);
     }
   }
 
   const terminal = document.getElementById("terminal");
 
+  // Command history, navigated with the Up and Down arrow keys.
+  const history = [];
+  let histIndex = 0;      // points one past the last entry when not browsing
+  let draft = "";         // the half-typed line, restored when arrowing back down
+
+  // Move the caret to the end after we set the value programmatically.
+  function caretToEnd() {
+    const n = input.value.length;
+    input.setSelectionRange(n, n);
+  }
+
+  // Longest string all candidates start with, for tab completion.
+  function commonPrefix(list) {
+    let p = list[0];
+    for (const s of list) {
+      while (!s.startsWith(p)) p = p.slice(0, -1);
+    }
+    return p;
+  }
+
+  // Tab completion: complete a command name for the first word, or a file name
+  // (from the virtual filesystem) for later words.
+  function complete() {
+    const value = input.value;
+    const parts = value.split(/\s+/);
+    const editingArg = parts.length > 1;
+    const token = parts[parts.length - 1];
+
+    let candidates;
+    if (!editingArg) {
+      candidates = Object.keys(commands)
+        .filter(function (n) { return n.startsWith(token.toLowerCase()); });
+    } else {
+      const files = window.vfs ? window.vfs.list() : [];
+      candidates = files.filter(function (f) { return f.startsWith(token); });
+    }
+    if (candidates.length === 0) return;
+
+    if (candidates.length === 1) {
+      parts[parts.length - 1] = candidates[0];
+      input.value = parts.join(" ") + " ";
+    } else {
+      const common = commonPrefix(candidates);
+      if (common.length > token.length) {
+        parts[parts.length - 1] = common;
+        input.value = parts.join(" ");
+      } else {
+        print(candidates.join("  "));
+        terminal.scrollTop = terminal.scrollHeight;
+      }
+    }
+    syncMirror();
+    caretToEnd();
+  }
+
+  input.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowUp") {
+      if (history.length === 0) return;
+      e.preventDefault();
+      if (histIndex === history.length) draft = input.value;
+      histIndex = Math.max(0, histIndex - 1);
+      input.value = history[histIndex];
+      syncMirror();
+      caretToEnd();
+    } else if (e.key === "ArrowDown") {
+      if (histIndex === history.length) return;
+      e.preventDefault();
+      histIndex = Math.min(history.length, histIndex + 1);
+      input.value = histIndex === history.length ? draft : history[histIndex];
+      syncMirror();
+      caretToEnd();
+    } else if (e.key === "Tab") {
+      e.preventDefault();
+      complete();
+    }
+  });
+
+  // Run a command and record it in history, so both typing Enter and clicking
+  // a hint behave the same and the Up arrow can recall either.
+  function submitCommand(value) {
+    run(value);
+    const trimmed = value.trim();
+    if (trimmed && history[history.length - 1] !== trimmed) history.push(trimmed);
+    histIndex = history.length;
+    draft = "";
+    terminal.scrollTop = terminal.scrollHeight;   // keep the input line in view
+  }
+
   form.addEventListener("submit", function (e) {
     e.preventDefault();
-    run(input.value);
+    submitCommand(input.value);
     input.value = "";
     syncMirror();
-    terminal.scrollTop = terminal.scrollHeight;   // keep the input line in view
+  });
+
+  // Clicking a command hint in the output runs that command.
+  output.addEventListener("click", function (e) {
+    const el = e.target.closest("[data-cmd]");
+    if (!el) return;
+    e.preventDefault();
+    submitCommand(el.getAttribute("data-cmd"));
+    input.focus();
   });
 
   // Clicking anywhere in the box focuses the input, like a real terminal.
@@ -169,7 +280,8 @@
   });
 
   // Greet the visitor on load.
-  print("welcome. type 'help' to see available commands.");
+  print("welcome. type " + cmdLink("help") +
+        " to see available commands.", null, true);
   input.focus();
 })();
 

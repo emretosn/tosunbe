@@ -114,8 +114,46 @@ section {
   border-radius: 4px;
   overflow: hidden;                  /* clip children to the rounded corners */
 }
+
+/* macOS-style title bar. It looks "inactive" (grey dots, dim title) by
+   default and turns "active" while the terminal input is focused, just like
+   a real window that is or is not the selected one. */
+.term-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.4rem 0.6rem;
+  background: #202020;               /* inactive shade */
+  border-bottom: 1px solid #000000;
+  user-select: none;
+  transition: background 0.15s ease;
+}
+.term-lights {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.term-light {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #4a4a4a;               /* grey while inactive */
+  transition: background 0.15s ease;
+}
+.term-titlebar-title {
+  color: var(--fg-dim);
+  font-size: 0.9rem;
+  transition: color 0.15s ease;
+}
+/* Active state: the input inside the window has focus. */
+.term-window:focus-within .term-titlebar { background: #2f2f2f; }
+.term-window:focus-within .term-titlebar-title { color: var(--fg); }
+.term-window:focus-within .term-light--close { background: #ff5f56; }
+.term-window:focus-within .term-light--min   { background: #ffbd2e; }
+.term-window:focus-within .term-light--max   { background: #27c93f; }
+
 .terminal {
-  height: 20rem;                     /* static size, does not grow */
+  height: 19rem;                     /* static size, does not grow */
   overflow-y: auto;                  /* the whole box scrolls internally */
   margin: 0;
   padding: var(--space);
@@ -140,6 +178,10 @@ section {
 .term-output a {
   color: var(--fg-bright);
   text-decoration: underline;
+}
+/* Clickable command hints (in help, prompts, and errors). */
+.term-output a.term-cmd {
+  cursor: pointer;
 }
 
 /* Input line: flows right after the printed output (not pinned to bottom). */
