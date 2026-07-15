@@ -391,6 +391,15 @@
     input.focus();
   });
 
+  // Clicking the title bar also activates the input (and turns the bar to its
+  // focused colors, via .term-window:focus-within).
+  const titlebar = document.querySelector(".term-titlebar");
+  if (titlebar) {
+    titlebar.addEventListener("click", function () {
+      input.focus();
+    });
+  }
+
   // A clickable hint that shows and runs the full command string verbatim,
   // used for the intro suggestions where the whole invocation should be shown.
   function cmdLinkFull(runStr) {
