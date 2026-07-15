@@ -13,6 +13,27 @@
   const EMAIL = "info.emre@tosun.be";
   const CV_UPDATED = "July 2026";
 
+  // Privilege state. Visitors can escalate to root with "sudo su".
+  let isRoot = false;
+  const promptLabel = form.querySelector(".term-prompt");
+  const tmuxWindow = document.querySelector(".tmux-window");
+  const titlebarTitle = document.querySelector(".term-titlebar-title");
+
+  function promptStr() {
+    return isRoot ? "root@tosunbe:~#" : "visitor@tosunbe:~$";
+  }
+
+  // Flip privilege and reflect it in the prompt label, the window title bar,
+  // and the tmux window name.
+  function setRoot(root) {
+    isRoot = root;
+    if (promptLabel) promptLabel.textContent = promptStr();
+    if (tmuxWindow) tmuxWindow.textContent = root ? "0:root*" : "0:zsh*";
+    if (titlebarTitle) {
+      titlebarTitle.textContent = root ? "root@tosunbe: ~" : "visitor@tosunbe: ~";
+    }
+  }
+
   // Keep the visible mirror text in sync with the real (transparent) input,
   // so the block cursor sits right after what the visitor has typed.
   function syncMirror() {
@@ -33,6 +54,12 @@
     output.appendChild(line);
   }
 
+  // Keep the newest output in view. Safe to call from delayed callbacks.
+  function scrollToBottom() {
+    const term = document.getElementById("terminal");
+    if (term) term.scrollTop = term.scrollHeight;
+  }
+
   // Escape untrusted text before placing it near innerHTML.
   function escapeHtml(s) {
     return s.replace(/[&<>"']/g, function (c) {
@@ -51,6 +78,10 @@
     cat: "cat about.txt"
   };
 
+  // Commands that work but are not advertised in help, so escalating to root
+  // and finding the hidden abilities stays a small discovery.
+  const hiddenInHelp = { sudo: true, su: true };
+
   // A clickable command hint. Clicking it runs the command (see the delegated
   // click handler on the output). The name is trusted (comes from our own
   // registry) but we escape it anyway out of habit.
@@ -65,13 +96,15 @@
   const commands = {
     help: function () {
       print("available commands:");
-      Object.keys(commands).sort().forEach(function (name) {
+      commandNames().filter(function (name) {
+        return !hiddenInHelp[name];
+      }).sort().forEach(function (name) {
         const pad = " ".repeat(Math.max(1, 9 - name.length));
         print("  " + cmdLink(name) + pad + descriptions[name], null, true);
       });
     },
     whoami: function () {
-      print("visitor");
+      print(isRoot ? "root" : "visitor");
     },
     github: function () {
       print('<a href="' + GITHUB_URL + '" target="_blank" ' +
@@ -84,19 +117,27 @@
     clear: function () {
       output.innerHTML = "";
     },
-    ls: function () {
+    ls: function (args) {
       if (!window.vfs) { print("ls: filesystem unavailable", "term-error"); return; }
-      print(window.vfs.list().join("  "));
+      // "-a" (or any flag bundle containing "a") reveals dotfiles.
+      const showAll = args.some(function (a) {
+        return a.charAt(0) === "-" && a.indexOf("a") !== -1;
+      });
+      print(window.vfs.list(showAll).join("  "));
     },
     cat: function (args) {
       if (!window.vfs) { print("cat: filesystem unavailable", "term-error"); return; }
       const name = args[0];
       if (!name) { print("usage: cat <file>", "term-error"); return; }
       if (!window.vfs.exists(name)) {
-        print("cat: " + name + ": no such file", "term-error");
+        print("cat: " + name + ": No such file or directory", "term-error");
         return;
       }
       const file = window.vfs.get(name);
+      if (file.rootOnlyRead && !isRoot) {
+        print("cat: " + name + ": Permission denied", "term-error");
+        return;
+      }
       if (file.binary) {
         print(file.hint || ("cat: " + name + ": binary file"), "term-error");
         return;
@@ -117,6 +158,29 @@
         print("cannot open: " + target, "term-error");
       }
     },
+    sudo: function (args) {
+      const sub = (args[0] || "").toLowerCase();
+      if (sub === "su" || sub === "-i" || sub === "-s") {
+        escalate();
+      } else if (!sub) {
+        print("usage: sudo [-u user] <command>", "term-error");
+      } else {
+        // Run a single command with elevated privilege, like real sudo.
+        const wasRoot = isRoot;
+        isRoot = true;
+        run(args.join(" "));
+        isRoot = wasRoot;
+      }
+    },
+    su: function (args) {
+      const who = (args[0] || "root").toLowerCase();
+      if (who === "root" || who === "") escalate();
+      else print("su: user " + args[0] + " does not exist", "term-error");
+    }
+  };
+
+  // Root-only commands. These are hidden and only run once escalated.
+  const rootCommands = {
     heap: function () {
       if (typeof window.heapAscii === "function") {
         print("ouch, pouring into a heap... click the heap to restore");
@@ -134,8 +198,49 @@
       } else {
         print("encrypt unavailable", "term-error");
       }
+    },
+    rm: function (args) {
+      const joined = args.join(" ");
+      if (/-[a-z]*r[a-z]*f|-[a-z]*f[a-z]*r/.test(joined) && args.indexOf("/") !== -1) {
+        print("rm: removing everything from /...");
+        setTimeout(function () {
+          print("rm: deleting /home... /etc... /var... /boot...");
+        }, 500);
+        setTimeout(function () {
+          print("just kidding. nothing was harmed. :)", "term-title");
+          scrollToBottom();
+        }, 1400);
+      } else if (!joined) {
+        print("rm: missing operand", "term-error");
+      } else {
+        const path = args[args.length - 1];
+        print("rm: cannot remove '" + path + "': No such file or directory",
+              "term-error");
+      }
+    },
+    exit: function () {
+      // Leaving the root shell is silent; the prompt returns to visitor.
+      setRoot(false);
     }
   };
+
+  // Escalate to root. Like a real "sudo su" with NOPASSWD, this is silent:
+  // the changed prompt (root@... and the # sign) is the only signal.
+  function escalate() {
+    setRoot(true);
+  }
+
+  // The commands available right now: base always, root extras once escalated.
+  function activeCommand(name) {
+    if (isRoot && rootCommands[name]) return rootCommands[name];
+    if (commands[name]) return commands[name];
+    return null;
+  }
+  function commandNames() {
+    const names = Object.keys(commands);
+    if (isRoot) names.push.apply(names, Object.keys(rootCommands));
+    return names;
+  }
 
   const descriptions = {
     help:   "list available commands",
@@ -148,23 +253,29 @@
     open:   "open cv.pdf in a window",
     heap:   "pour the ascii portrait into a heap",
     encrypt: "encrypt the portrait",
-    clear:  "clear the screen"
+    sudo:   "run as root, for example: sudo su",
+    su:     "switch to the root user",
+    clear:  "clear the screen",
+    rm:     "remove files (root)",
+    exit:   "drop back to the visitor user"
   };
 
   function run(raw) {
     const cmd = raw.trim();
-    // Echo what the visitor typed, prefixed with the prompt.
-    print("visitor@tosunbe:~$ " + cmd, "term-echo");
+    // Echo what the visitor typed, prefixed with the current prompt.
+    print(promptStr() + " " + cmd, "term-echo");
     if (cmd === "") return;
 
     const parts = cmd.split(/\s+/);
     const name = parts[0].toLowerCase();
     const args = parts.slice(1);
-    if (commands[name]) {
-      commands[name](args);
+    const fn = activeCommand(name);
+    if (fn) {
+      fn(args);
     } else {
-      print("command not found: " + escapeHtml(name) + ". type " +
-            cmdLink("help") + ".", "term-error", true);
+      // Real zsh format. Hidden root commands simply look nonexistent to a
+      // visitor, exactly as an out-of-PATH command would.
+      print("zsh: command not found: " + parts[0], "term-error");
     }
   }
 
@@ -200,10 +311,11 @@
 
     let candidates;
     if (!editingArg) {
-      candidates = Object.keys(commands)
+      candidates = commandNames()
         .filter(function (n) { return n.startsWith(token.toLowerCase()); });
     } else {
-      const files = window.vfs ? window.vfs.list() : [];
+      const showAll = token.charAt(0) === ".";
+      const files = window.vfs ? window.vfs.list(showAll) : [];
       candidates = files.filter(function (f) { return f.startsWith(token); });
     }
     if (candidates.length === 0) return;
@@ -279,9 +391,19 @@
     input.focus();
   });
 
-  // Greet the visitor on load.
-  print("welcome. type " + cmdLink("help") +
-        " to see available commands.", null, true);
+  // A clickable hint that shows and runs the full command string verbatim,
+  // used for the intro suggestions where the whole invocation should be shown.
+  function cmdLinkFull(runStr) {
+    const safe = escapeHtml(runStr);
+    return '<a class="term-cmd" data-cmd="' + safe + '" href="#">' + safe + "</a>";
+  }
+
+  // Greet the visitor with a compact intro and a few things to try.
+  print("Emre Tosun, security engineer and researcher.", "term-title");
+  print("cryptography · AI · cloud", "term-muted");
+  print("");
+  print("try:  " + cmdLinkFull("cat about.txt") + "   " +
+        cmdLinkFull("open cv.pdf") + "   " + cmdLink("help"), null, true);
   input.focus();
 })();
 

@@ -172,6 +172,12 @@ section {
 .term-output .term-echo {
   color: var(--fg-bright);           /* the command the visitor typed */
 }
+.term-output .term-title {
+  color: var(--fg-bright);           /* the intro name line */
+}
+.term-output .term-muted {
+  color: var(--fg-dim);              /* secondary intro text */
+}
 .term-output .term-error {
   color: var(--fg);
 }

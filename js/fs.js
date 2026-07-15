@@ -8,7 +8,10 @@
 
 (function () {
   // Each entry is a file. Text files have a "content" string. Binary files
-  // (like the PDF) have no readable content, only a hint for cat.
+  // (like the PDF) carry only a hint for cat. Dotfiles (names starting with
+  // ".") are hidden from a plain ls and only appear with "ls -a", just like a
+  // real shell. "rootOnlyRead" files exist and are visible with -a, but cat
+  // refuses to read them unless you are root (a real "Permission denied").
   const FILES = {
     "about.txt": {
       content:
@@ -18,21 +21,39 @@
     "cv.pdf": {
       binary: true,
       hint: "cat: cv.pdf: binary file, run: open cv.pdf"
+    },
+    ".secrets": {
+      rootOnlyRead: true,
+      content:
+        "root@tosunbe secrets\n" +
+        "--------------------\n" +
+        "hidden abilities, unlocked as root:\n" +
+        "\n" +
+        "  heap      pour the ascii portrait into a heap, then click to restore\n" +
+        "  encrypt   encrypt the portrait with AES-256-GCM, click it to decrypt\n" +
+        "\n" +
+        "have fun. type exit to drop back to visitor."
     }
   };
 
   const HOME = "/home/visitor";   // what pwd reports; the prompt shows this as ~
 
+  function has(map, name) {
+    return Object.prototype.hasOwnProperty.call(map, name);
+  }
+
   window.vfs = {
-    // File names, sorted, for ls.
-    list: function () {
-      return Object.keys(FILES).sort();
+    // File names, sorted, for ls. Dotfiles are hidden unless showAll ("-a").
+    list: function (showAll) {
+      return Object.keys(FILES).filter(function (n) {
+        return showAll || n.charAt(0) !== ".";
+      }).sort();
     },
     exists: function (name) {
-      return Object.prototype.hasOwnProperty.call(FILES, name);
+      return has(FILES, name);
     },
     get: function (name) {
-      return FILES[name];
+      return has(FILES, name) ? FILES[name] : undefined;
     },
     home: function () {
       return HOME;
