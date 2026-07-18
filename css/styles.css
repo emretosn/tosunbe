@@ -103,10 +103,6 @@ a:focus-visible {
   cursor: pointer;
 }
 
-/* Hide the panel while the CV is docked: the reserved right-hand space would
-   otherwise crowd the portrait, and keeping only the portrait keeps it clean. */
-body.cv-docked { display: none; }
-
 /* ---------- Sections ---------- */
 section {
   margin-bottom: calc(var(--space) * 2);

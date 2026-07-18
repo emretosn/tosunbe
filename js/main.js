@@ -10,6 +10,7 @@
   if (!form || !input || !output) return;
 
   const GITHUB_URL = "https://github.com/emretosn";
+  const LINKEDIN_URL = "https://www.linkedin.com/in/emretsn/";
   const EMAIL = "info.emre@tosun.be";
   const CV_UPDATED = "July 2026";
 
@@ -106,13 +107,22 @@
     whoami: function () {
       print(isRoot ? "root" : "visitor");
     },
-    github: function () {
-      print('<a href="' + GITHUB_URL + '" target="_blank" ' +
-            'rel="noopener">' + escapeHtml(GITHUB_URL) + "</a>", null, true);
-    },
-    email: function () {
-      print('<a href="mailto:' + EMAIL + '">' +
-            escapeHtml(EMAIL) + "</a>", null, true);
+    socials: function () {
+      // One aligned, clickable row per profile so all links live in one place.
+      const rows = [
+        ["github", GITHUB_URL, true],
+        ["linkedin", LINKEDIN_URL, true],
+        ["email", EMAIL, false]
+      ];
+      rows.forEach(function (r) {
+        const label = r[0], value = r[1], external = r[2];
+        const pad = " ".repeat(Math.max(1, 10 - label.length));
+        const href = external ? value : "mailto:" + value;
+        const attrs = external ? ' target="_blank" rel="noopener"' : "";
+        print(escapeHtml(label) + pad +
+              '<a href="' + href + '"' + attrs + ">" +
+              escapeHtml(value) + "</a>", null, true);
+      });
     },
     clear: function () {
       output.innerHTML = "";
@@ -248,8 +258,7 @@
     ls:     "list files",
     cat:    "print a file, for example: cat about.txt",
     pwd:    "print the working directory",
-    github: "open my github profile",
-    email:  "get in touch by email",
+    socials: "list my profiles and links",
     open:   "open cv.pdf in a window",
     heap:   "pour the ascii portrait into a heap",
     encrypt: "encrypt the portrait",
@@ -408,11 +417,7 @@
   }
 
   // Greet the visitor with a compact intro and a few things to try.
-  print("Emre Tosun, security engineer and researcher.", "term-muted");
-  print("cryptography, AI, Cloud", "term-muted");
-  print("");
-  print("try:  " + cmdLinkFull("cat about.txt") + "   " +
-        cmdLinkFull("open cv.pdf") + "   " + cmdLink("help"), "term-muted", true);
+  print("try " + cmdLink("help") + " to see available commands", "term-muted", true);
   input.focus();
 })();
 
