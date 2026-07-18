@@ -94,7 +94,7 @@ a:focus-visible {
   color: var(--fg);
   font-family: var(--mono);
   line-height: 1.1;                 /* tight so the art holds its shape */
-  font-size: clamp(6px, 1.6vw, 7px);
+  font-size: clamp(6px, 1.6vw, 6px);
   white-space: pre;                 /* preserve every space */
   overflow-x: auto;                 /* scroll if too wide   */
 }
@@ -153,7 +153,7 @@ section {
 .term-window:focus-within .term-light--max   { background: #27c93f; }
 
 .terminal {
-  height: 19rem;                     /* static size, does not grow */
+  height: 24rem;                     /* static size, does not grow */
   overflow-y: auto;                  /* the whole box scrolls internally */
   margin: 0;
   padding: var(--space);
