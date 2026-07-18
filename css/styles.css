@@ -12,7 +12,7 @@
   --fg-dim:    #6a6a6a;   /* dim gray, secondary text     */
   --accent:    #9a9a9a;   /* mid gray, borders and hover  */
 
-  --mono: "SFMono-Regular", "SF Mono", Menlo, Consolas,
+  --mono: "JetBrains Mono", "SFMono-Regular", "SF Mono", Menlo, Consolas,
           "DejaVu Sans Mono", monospace;
 
   --maxw: 1024px;          /* content column width */
