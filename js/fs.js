@@ -26,13 +26,10 @@
       rootOnlyRead: true,
       content:
         "root@tosunbe secrets\n" +
-        "--------------------\n" +
-        "hidden abilities, unlocked as root:\n" +
+        "hidden abilities as root:\n" +
         "\n" +
         "  heap      pour the ascii portrait into a heap, then click to restore\n" +
-        "  encrypt   encrypt the portrait with AES-256-GCM, click it to decrypt\n" +
-        "\n" +
-        "have fun. type exit to drop back to visitor."
+        "  encrypt   encrypt the portrait with AES-256-GCM, click it to decrypt\n"
     }
   };
 

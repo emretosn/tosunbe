@@ -408,11 +408,11 @@
   }
 
   // Greet the visitor with a compact intro and a few things to try.
-  print("Emre Tosun, security engineer and researcher.", "term-title");
-  print("cryptography · AI · cloud", "term-muted");
+  print("Emre Tosun, security engineer and researcher.", "term-muted");
+  print("cryptography, AI, Cloud", "term-muted");
   print("");
   print("try:  " + cmdLinkFull("cat about.txt") + "   " +
-        cmdLinkFull("open cv.pdf") + "   " + cmdLink("help"), null, true);
+        cmdLinkFull("open cv.pdf") + "   " + cmdLink("help"), "term-muted", true);
   input.focus();
 })();
 
@@ -437,32 +437,23 @@
   setInterval(render, 1000);
 })();
 
-// CV window: a draggable, resizable macOS-style window showing the CV PDF.
 // The PDF is rendered by the browser's native viewer inside an iframe, which
 // handles scrolling and zoom, so no PDF library is needed.
 (function () {
   const win = document.getElementById("cv-window");
-  const titlebar = document.getElementById("cv-titlebar");
   const closeBtn = document.getElementById("cv-close");
   const frame = document.getElementById("cv-frame");
-  const handles = document.querySelectorAll(".win-resize");
-  if (!win || !titlebar || !frame) return;
+  if (!win || !frame) return;
 
   const CV_SRC = "assets/Emre_Tosun.pdf";
-  const MIN_W = 320;
-  const MIN_H = 240;
 
-  // On touch devices the window is fixed and padded (positioned by CSS), so we
-  // skip dragging and clear any inline size/position that JS may have set.
+  // On touch devices the window is fixed and padded (positioned entirely by
+  // CSS). On desktop it docks as a static panel on the right.
   const mobileQuery = window.matchMedia("(hover: none) and (pointer: coarse)");
   function isMobile() { return mobileQuery.matches; }
-  function clearInlineBox() {
-    win.style.left = win.style.top = win.style.width = win.style.height = "";
-  }
-  // Re-clear when rotating into (or resizing down to) the mobile layout.
+  // Reset the docked state when rotating into (or resizing down to) mobile.
   mobileQuery.addEventListener("change", function (e) {
     if (e.matches) {
-      clearInlineBox();
       win.classList.remove("win--docked", "win--entering");
       document.body.classList.remove("cv-docked");
       document.body.style.removeProperty("--cv-reserve");
@@ -489,11 +480,10 @@
     if (frame.getAttribute("src") !== CV_SRC) frame.setAttribute("src", CV_SRC);
     clearTimeout(closeTimer);
     win.hidden = false;
-    if (isMobile()) { clearInlineBox(); return; }   // CSS handles placement
+    if (isMobile()) return;                          // CSS handles placement
 
     // Desktop: dock as a static A4 panel on the right and let the content
     // column slide left to sit beside it.
-    clearInlineBox();                 // drop any leftover drag position
     win.classList.add("win--docked", "win--entering");
     // Force a layout read so the panel has real dimensions before we measure.
     dockWidthUpdate();
@@ -532,92 +522,6 @@
   closeBtn.addEventListener("click", closeCV);
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape" && !win.hidden) closeCV();
-  });
-
-  // While dragging or resizing, disable pointer events on the iframe so it
-  // does not swallow the pointermove events.
-  function beginInteraction() { frame.style.pointerEvents = "none"; }
-  function endInteraction() { frame.style.pointerEvents = ""; }
-
-  function clamp(v, min, max) { return Math.min(Math.max(v, min), max); }
-
-  // Drag the window by its title bar, kept fully inside the viewport.
-  let dragging = false, dsx, dsy, dox, doy;
-  titlebar.addEventListener("pointerdown", function (e) {
-    if (e.target === closeBtn || isMobile() ||
-        win.classList.contains("win--docked")) return;
-    dragging = true;
-    dsx = e.clientX; dsy = e.clientY;
-    const r = win.getBoundingClientRect();
-    dox = r.left; doy = r.top;
-    beginInteraction();
-    titlebar.setPointerCapture(e.pointerId);
-  });
-  titlebar.addEventListener("pointermove", function (e) {
-    if (!dragging) return;
-    const maxLeft = window.innerWidth - win.offsetWidth;
-    const maxTop = window.innerHeight - win.offsetHeight;
-    win.style.left = clamp(dox + e.clientX - dsx, 0, Math.max(0, maxLeft)) + "px";
-    win.style.top = clamp(doy + e.clientY - dsy, 0, Math.max(0, maxTop)) + "px";
-  });
-  function stopDrag(e) {
-    if (!dragging) return;
-    dragging = false;
-    endInteraction();
-    try { titlebar.releasePointerCapture(e.pointerId); } catch (_) {}
-  }
-  titlebar.addEventListener("pointerup", stopDrag);
-  titlebar.addEventListener("pointercancel", stopDrag);
-
-  // Resize from any of the four corners, staying within the viewport.
-  let resizing = null, rsx, rsy, rleft, rtop, rw, rh, activeHandle;
-  handles.forEach(function (handle) {
-    handle.addEventListener("pointerdown", function (e) {
-      if (win.classList.contains("win--docked")) return;
-      resizing = handle.dataset.dir;
-      activeHandle = handle;
-      rsx = e.clientX; rsy = e.clientY;
-      const r = win.getBoundingClientRect();
-      rleft = r.left; rtop = r.top; rw = r.width; rh = r.height;
-      beginInteraction();
-      handle.setPointerCapture(e.pointerId);
-      e.preventDefault();
-    });
-    handle.addEventListener("pointermove", function (e) {
-      if (resizing !== handle.dataset.dir) return;
-      const dir = resizing;
-      const dx = e.clientX - rsx;
-      const dy = e.clientY - rsy;
-      let left = rleft, top = rtop, w = rw, h = rh;
-
-      if (dir.indexOf("e") !== -1) w = rw + dx;
-      if (dir.indexOf("s") !== -1) h = rh + dy;
-      if (dir.indexOf("w") !== -1) { w = rw - dx; left = rleft + dx; }
-      if (dir.indexOf("n") !== -1) { h = rh - dy; top = rtop + dy; }
-
-      // Enforce minimum size, keeping the opposite edge anchored.
-      if (w < MIN_W) { if (dir.indexOf("w") !== -1) left -= (MIN_W - w); w = MIN_W; }
-      if (h < MIN_H) { if (dir.indexOf("n") !== -1) top -= (MIN_H - h); h = MIN_H; }
-
-      // Keep the window within the viewport edges.
-      if (left < 0) { w += left; left = 0; }
-      if (top < 0) { h += top; top = 0; }
-      if (left + w > window.innerWidth) w = window.innerWidth - left;
-      if (top + h > window.innerHeight) h = window.innerHeight - top;
-
-      win.style.left = left + "px";
-      win.style.top = top + "px";
-      win.style.width = Math.max(MIN_W, w) + "px";
-      win.style.height = Math.max(MIN_H, h) + "px";
-    });
-    function stopResize(e) {
-      if (resizing !== handle.dataset.dir) return;
-      resizing = null;
-      endInteraction();
-      try { handle.releasePointerCapture(e.pointerId); } catch (_) {}
-    }
-    handle.addEventListener("pointerup", stopResize);
-    handle.addEventListener("pointercancel", stopResize);
   });
 })();
 

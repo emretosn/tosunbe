@@ -103,6 +103,10 @@ a:focus-visible {
   cursor: pointer;
 }
 
+/* Hide the panel while the CV is docked: the reserved right-hand space would
+   otherwise crowd the portrait, and keeping only the portrait keeps it clean. */
+body.cv-docked { display: none; }
+
 /* ---------- Sections ---------- */
 section {
   margin-bottom: calc(var(--space) * 2);
@@ -177,6 +181,14 @@ section {
 }
 .term-output .term-muted {
   color: var(--fg-dim);              /* secondary intro text */
+}
+/* Links inside a muted line stay dim, brightening on hover for affordance. */
+.term-output .term-muted a {
+  color: var(--fg-dim);
+}
+.term-output .term-muted a:hover,
+.term-output .term-muted a:focus-visible {
+  color: var(--fg);
 }
 .term-output .term-error {
   color: var(--fg);
@@ -305,25 +317,18 @@ section {
   transform: translate(2rem, -50%);
   opacity: 0;
 }
-/* A static panel has no drag handle and no resize grips. */
-.win--docked .win-titlebar { cursor: default; }
-.win--docked .win-resize { display: none; }
 .win-titlebar {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   padding: 0.5rem 0.75rem;
   background: #2a2a2a;
-  cursor: move;
   user-select: none;
-  touch-action: none;                /* let the drag handler own the gesture */
 }
 .win-lights {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  position: relative;
-  z-index: 3;                        /* stay clickable above corner handles */
 }
 .win-light {
   width: 12px;
@@ -350,22 +355,6 @@ section {
   border: none;
   display: block;
 }
-/* Resize grips at all four corners. */
-.win-resize {
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  z-index: 2;
-  touch-action: none;
-}
-.win-resize--nw { left: 0;  top: 0;    cursor: nwse-resize; }
-.win-resize--ne { right: 0; top: 0;    cursor: nesw-resize; }
-.win-resize--sw { left: 0;  bottom: 0; cursor: nesw-resize; }
-.win-resize--se { right: 0; bottom: 0; cursor: nwse-resize; }
-/* Subtle visual grip on the bottom-right corner. */
-.win-resize--se {
-  background: linear-gradient(135deg, transparent 55%, var(--fg-dim) 55%);
-}
 /* Mobile / touch devices: a fixed, padded window that fills the screen within
    its edges. Using inset means the size follows the screen orientation
    automatically, in both portrait and landscape. */
@@ -377,8 +366,6 @@ section {
     min-width: 0;
     min-height: 0;
   }
-  .win-titlebar { cursor: default; }   /* no dragging on touch devices */
-  .win-resize { display: none; }       /* no manual resize on touch devices */
 }
 
 /* ---------- Fluid background layer: rippling grid of 0/1 bits ---------- */
