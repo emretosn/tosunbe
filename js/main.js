@@ -11,7 +11,7 @@
 
   const GITHUB_URL = "https://github.com/emretosn";
   const LINKEDIN_URL = "https://www.linkedin.com/in/emretsn/";
-  const EMAIL = "info.emre@tosun.be";
+  const EMAIL = "emre@tosun.be";
   const CV_UPDATED = "July 2026";
 
   // Privilege state. Visitors can escalate to root with "sudo su".
@@ -255,7 +255,7 @@
   const descriptions = {
     help:   "list available commands",
     whoami: "print the current user",
-    ls:     "list files",
+    ls:     "list files, along with dotfiles if -a is given",
     cat:    "print a file, for example: cat about.txt",
     pwd:    "print the working directory",
     socials: "list my profiles and links",
