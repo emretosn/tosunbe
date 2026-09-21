@@ -7,7 +7,6 @@ const IMAGES = [
   "dHdlbnR5Zml2ZQ.webp",
   "dHJlZQ.webp",
   "YmVsZ2l1bQ.webp",
-  "YXJlbmJlcmdmb3Jlc3Q.webp",
   "ZXNhdA.webp",
 ];
 
