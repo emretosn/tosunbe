@@ -1,13 +1,14 @@
 # emre.tosun.be
 
-Personal site. Static, no build step, zero JavaScript.
+Personal site. Static, no build step. One small script: picks a random image on refresh.
 Palette: MSX2 16-color hardware palette.
 
 ## Structure
 ```
 index.html              single page
 css/styles.css          styling, msx palette tokens
-assets/                 dithered artwork, cv.pdf
+js/images.js            random image picker
+assets/                 dithered artwork
 ```
 
 ## Run locally
