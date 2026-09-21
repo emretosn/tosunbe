@@ -4,3 +4,7 @@
 # Vim / Neovim
 *.swp
 *.swo
+
+# Oversized source variants of the dithered artwork (webp is used on the site)
+assets/dithering-effect.svg
+assets/dithering-effect.jpeg

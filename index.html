@@ -1,133 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>emre</title>
-  <meta name="description" content="Personal site of Emre." />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>emre tosun</title>
+  <meta name="description" content="emre tosun — security engineer and researcher.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23000'/%3E%3Ctext x='8' y='12' fill='%23cccccc' font-family='monospace' font-size='13' font-weight='bold' text-anchor='middle'%3Ee%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap">
-  <link rel="stylesheet" href="css/styles.css" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
-  <link rel="manifest" href="/assets/site.webmanifest">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap">
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <canvas id="fluid-bg" aria-hidden="true"></canvas>
+  <main class="screen">
+    <section class="intro">
+      <p class="path">~/emre.tosun.be</p>
+      <h1 class="name">emre tosun</h1>
+      <p class="role">software engineer &amp; researcher</p>
+      <p class="tags">cryptography, cloud, agents</p>
 
-  <main class="wrap">
-    <section id="portrait" class="portrait">
-<pre class="ascii-art" aria-label="ASCII portrait">
-
-                                m    mrrirmm m          m
-                                mvvvvv rvmrvvrrirvmmivm  ri  v
-                                rvvrrrrrr  mrvmr      vvmv v rr
-                            ivrrrrvvrrvvr rvv vm r  v v      vv
-                          vrvvvvrmmvvvvv v v     rv v     v   vr
-                       vmvmrvmmmmrrrv  vvv vvrvvv vv  v   vvvvvrvm
-                      rvvrrrrrrvrrrvrmrrvvv v v      v v    vvvmrmmi
-                      rrvmmvmrrrrvvmrrvv            vvv vv  vvvvvvmrv
-                     rrrvvvrrvvvvrrrvv  vv v  vvvv     vvrv vvvrvvvv r
-                     rvvvvvvvvmrrvvvm rvrrmmrvvvvvvv v  vvrvrvvvvvvvv vr
-                    mvvvvr vrvrrrvvvvvrmmmidddrrrvvvvvrrrvvvvvvv vvvv v
-                    mvvvvvvrvrrvrmvmmviiiii0dd0mrrrrmrimrrrrvvvv  vvvv v
-                    ivv  vvrvrviiiiidrm660006ii6000diddiiimmmv vvvvvv vr
-                    rvv vvvmii00didd6i06161111660016000ddiiimmr vvv vvv
-                     vvvrrmddddimmrrrmd0d066616666000dddiididdmrvvvvvvr
-                       rmiirmmrrvvrrrrmmid06666600idmvvvvvrrmrrimmrrvv
-                    r v  vmmmmidiiiiimrrmd066600dimrr6vvrrrr   vmmmmvv
-                    v  vimmidd066600diimvvimrvv0mrvmmmiiddiiimrvrr  v
-                    v  mddidddddd0ddiimmir vrrr vvrmmmmmmidiimmrrrm   r
-                    mvvmd0dddiimvvvvrriidvv1166rrrrmimmiiddimmmmmmmv rv
-                    vrrmd000dmiiddddiddddm61116drmmrrmrvvvvrvvmmiimvvr
-                    i rr006666000dd00066ri661660mvddddiidiiimmiddiir v
-                     rrmdd0666661661666rm6666160dvi6606606000000ddvm m
-                   r66rd0m666666611111md666111666dmr6666166666000rmrvm
-                   iii0d0066mrridmrr6i6666116116060idv161616666midmmmmm
-                    066d006660dddd00666600666660did00diiiiiiiidddimmmm
-                    16dd0066661166666ddmvvvidddmv rii66666666600diiri0
-                    160d00666166666666irmmiiiimrrrrrmd6666666600diimd0
-                    1660000666666666666ddidiimrrrrmiddd00000000diiidd0
-                    i66606066666diidi0iiddidiiidmiirdriidi0000ddddidi
-                     6660606660imiddd0d00000660dddiiiiiimmmd000dddidd
-                        0000660dimvrrrmidmmmmmmmrrmrrvvvrmmi60dddi
-                        d00006660066660000666000dddddddiddd000iidi
-                         d00006666666666660dddddd0ddddd000060iiii
-                         d00000666666660000ddidddddddd000600iiiim
-                          d06006666666661116661666660000000diimm
-                           d00666666616616616166666666000ddiimv
-                           did00666661611111116666660000diimmr
-                           0diid06661166661666666600000dimmmmm
-                           00diiii0060666666000dddddddimmmmmrm
-                          r0000diiimiiddiiimmmimimmimmmmmmmmmm
-                       mrri06600diiiiimmriimiiiiimmmmmmmmmmmmm
-                   mrrrr06d006660dddiiiiiiiiiiiiimmmmmmmmmmiddvvv
-                rmmmrrrid606066600000ddiiiiiiiiimimmmmmmmiidddmvvvvv
-             rrrrmmrrrr16006666660000000ddddddiiiiiiimmmiddddimmvvvrrrrr
-         rrrmmrrmmrrmrr66066666600000000000ddddddddddddddddddimivvvrrrvrrrr
-    rmrrrrrrrrmmmmmrrrr1666666666600000000000ddiddddddddddddddiivvvrrrrrrrrrr
-rmvrrrrrmrrrrmmmmrrrrmr0666666666660000000000ddddddddddddd0ddiirvvrrrrrrrrrrrrrrv
-rrrmmrrmrrrrrrrmmrmrrrrm6666666666660660000000ddddddddd000ddddivvvrrrrrrrrrrrrrrrrr
-rrrrrrmrrrrrrrmmrrmmvrrr6666666666666666666606000dddd0000dddddvvvrrrrrrrrrrrrrrrrrrrvrrr
-rrrrrrrrrrrmrrmmrrmrmrmrm1666666666660666666660000d000000d00dvvvrrrrrrrrrrrrrrrrrrrrrrrrr
-rrmrmrrrrrrmmrmmrmrrmrrmrrm616666661660066666660ddd00000000irvvvrrrrrrrrrrrrrrrrrrrrrrrrr
-rrmrrrrrrmrrrrmmmrrrmmrrrrrm11666661166000000dddd060660000rvvvrrmrrrrrrrrrrrrrrrrrrrrrrrr
-rmmrrvvrrrrmrrrrrrrmmmmrrmrrrr1606616661600000066666660irrrvvrmrrrrrrrrrrrrrrrrrrrrrrrrrr
-rrrrrrrrmrrmrmrrrrrrmmmrrrrrrrrrm66611666666666666660rrrvvvrrmrrrrrrmrrrmrrrrrrrrrrrrrrrr
-rrrvrrrrrrmrrmmrrrmmrmmmrmrrrrrrrrrri66666606666imrrrrrvvvrrrmrrrrrrmrrrrrrrrrrrrrrrrrrrr
-rrrvrrrmrrmrrmmrrrrrrrmrrmmmrrmmmmmrrrrrrrmrrrrrrrrrrvrrrrrmrrrrrmrrmrrrrmrmrrrrrrrrrrrrr
-
-</pre>
+      <ul class="list">
+        <li><span class="kw">let</span> <span class="ident">emre</span> <span class="op">=</span> <span class="type">Contact</span> <span class="punct">{</span></li>
+        <li>    <span class="field">github:</span>   <a href="https://github.com/emretosn"><span class="str">"emretosn"</span></a><span class="punct">,</span></li>
+        <li>    <span class="field">linkedin:</span> <a href="https://www.linkedin.com/in/emretsn/"><span class="str">"emretsn"</span></a><span class="punct">,</span></li>
+        <li>    <span class="field">email:</span>    <a href="mailto:emre@tosun.be"><span class="str">"emre@tosun.be"</span></a></li>
+        <li><span class="punct">};</span></li>
+      </ul>
     </section>
 
-    <div class="term-window">
-    <div class="term-titlebar" aria-hidden="true">
-      <div class="term-lights">
-        <span class="term-light term-light--close"></span>
-        <span class="term-light term-light--min"></span>
-        <span class="term-light term-light--max"></span>
-      </div>
-      <span class="term-titlebar-title">visitor@tosunbe: ~</span>
-    </div>
-    <section id="terminal" class="terminal" aria-label="Terminal">
-      <div class="term-output" id="term-output" aria-live="polite"></div>
-      <form class="term-line" id="term-form" autocomplete="off">
-        <label for="term-input" class="term-prompt">visitor@tosunbe:~$</label>
-        <span class="term-field">
-          <span class="term-mirror" id="term-mirror" aria-hidden="true"></span><span class="term-cursor" id="term-cursor" aria-hidden="true">&#9608;</span>
-          <input id="term-input" class="term-input" type="text" name="cmd"
-                 autocomplete="off" autocapitalize="off" autocorrect="off"
-                 spellcheck="false" aria-label="Terminal command input" />
-        </span>
-      </form>
-    </section>
-    <div class="tmux-status" aria-hidden="true">
-      <span class="tmux-left"><span class="tmux-session">[0]</span> <span class="tmux-window">0:zsh*</span></span>
-      <span class="tmux-right" id="tmux-clock"></span>
-    </div>
-    </div>
+    <figure class="frame">
+      <figcaption class="frame-bar">YXJlbmJlcmdmb3Jlc3Q.webp</figcaption>
+      <img src="assets/arenbergforest.webp"
+           alt="Dithered photograph"
+           width="1600" height="1204">
+    </figure>
   </main>
-
-  <!-- macOS-style window for viewing the CV, hidden until "open cv.pdf". -->
-  <div id="cv-window" class="win" role="dialog" aria-label="cv.pdf" aria-modal="false" hidden>
-    <div class="win-titlebar">
-      <div class="win-lights">
-        <button class="win-light win-close" id="cv-close" type="button" aria-label="Close"></button>
-        <span class="win-light win-min" aria-hidden="true"></span>
-        <span class="win-light win-max" aria-hidden="true"></span>
-      </div>
-      <span class="win-title">cv.pdf</span>
-    </div>
-    <div class="win-body">
-      <iframe id="cv-frame" class="win-frame" title="CV PDF" src="about:blank"></iframe>
-    </div>
-  </div>
-
-  <script src="js/fs.js" defer></script>
-  <script src="js/main.js" defer></script>
-  <script src="js/heap.js" defer></script>
-  <script src="js/crypto.js" defer></script>
 </body>
 </html>
