@@ -146,6 +146,11 @@ a:hover .str {
   font-size: 0.72rem;
 }
 
+.frame-bar--bottom {
+  border-bottom: none;
+  border-top: 1px solid var(--line);
+}
+
 .frame img {
   display: block;
   width: 100%;
