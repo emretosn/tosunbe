@@ -126,6 +126,10 @@ body {
   color: var(--msx-15-white);
 }
 
+.fn {
+  color: var(--msx-13-magenta);
+}
+
 .type {
   color: var(--msx-07-cyan);
 }
