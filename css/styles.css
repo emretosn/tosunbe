@@ -113,9 +113,17 @@ body {
   visibility: visible;
 }
 
-.panic {
-  margin-top: 0.4rem;
+.diag-loc {
+  color: var(--msx-04-dark-blue);
+}
+
+.diag-underline,
+.diag-msg {
   color: var(--msx-08-medium-red);
+}
+
+.diag-help {
+  color: var(--msx-07-cyan);
 }
 
 .kw {

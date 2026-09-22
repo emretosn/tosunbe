@@ -19,8 +19,12 @@
       <p class="role">path not found</p>
 
       <ul class="list">
-        <li><span class="kw">let</span> <span class="ident">page</span> <span class="op">=</span> <span class="fn">fetch</span><span class="punct">(</span><span class="ident">path</span><span class="punct">).</span><span class="fn">unwrap</span><span class="punct">();</span></li>
-        <li class="panic">thread 'main' panicked at 'no such route'</li>
+        <li><span class="diag-loc">   --&gt; src/web/routes.rs:404:13</span></li>
+        <li><span class="diag-loc">    |</span></li>
+        <li><span class="diag-loc">404 | </span><span class="kw">let</span> <span class="ident">page</span> <span class="op">=</span> <span class="fn">fetch</span><span class="punct">(</span><span class="ident">path</span><span class="punct">).</span><span class="fn">unwrap</span><span class="punct">();</span></li>
+        <li><span class="diag-loc">    | </span>           <span class="diag-underline">^^^^^^^^^^^</span> <span class="diag-msg">route does not exist</span></li>
+        <li><span class="diag-loc">    |</span></li>
+        <li><span class="diag-loc">    = </span><span class="diag-help">help</span>: try navigating back to the homepage</li>
       </ul>
     </section>
   </main>
