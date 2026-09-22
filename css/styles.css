@@ -95,6 +95,14 @@ body {
   white-space: pre-wrap;
 }
 
+.gpg-line {
+  visibility: hidden;
+}
+
+.gpg-line.show {
+  visibility: visible;
+}
+
 .kw {
   color: var(--msx-05-light-blue);
 }
