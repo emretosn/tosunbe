@@ -25,7 +25,7 @@ if (img && bar) {
   const last = sessionStorage.getItem("image");
   const pool = IMAGES.length > 1 ? IMAGES.filter((name) => name !== last) : IMAGES;
   const name = pool[Math.floor(Math.random() * pool.length)];
-  img.src = "assets/" + name;
+  img.src = "/assets/" + name;
   img.alt = decode(name);
   bar.textContent = name;
   sessionStorage.setItem("image", name);
