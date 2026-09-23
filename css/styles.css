@@ -48,6 +48,27 @@ body {
   color: var(--bg);
 }
 
+.topbar {
+  max-width: 62rem;
+  margin: 0 auto;
+  padding: 1.5rem 1.5rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.topbar a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.topbar a:hover {
+  background: none;
+  color: var(--bright);
+}
+
 .screen {
   min-height: 100vh;
   max-width: 62rem;
@@ -72,8 +93,9 @@ body {
 
 .path a:hover {
   background: none;
-  color: inherit;
+  color: var(--bright);
 }
+
 
 .name {
   margin: 0.4rem 0 0.6rem;
@@ -190,6 +212,35 @@ a:hover .str {
   display: block;
   width: 100%;
   height: auto;
+}
+
+.screen--single {
+  grid-template-columns: 1fr;
+  min-height: 0;
+  align-items: start;
+  padding-top: 3rem;
+}
+
+.path-sep {
+  color: var(--muted);
+}
+
+.path-current {
+  color: var(--fg);
+}
+
+.dir-list a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.dir-list a:hover {
+  background: none;
+  color: var(--bright);
+}
+
+.dir-nav {
+  color: var(--muted);
 }
 
 @media (max-width: 46rem) {
