@@ -135,6 +135,14 @@ body {
   visibility: visible;
 }
 
+.gpg-line:has(a:hover) a {
+  background: var(--bright);
+}
+
+.gpg-line:has(a:hover) .str {
+  color: var(--bg);
+}
+
 .diag-loc {
   color: var(--msx-04-dark-blue);
 }
